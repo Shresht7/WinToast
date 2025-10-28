@@ -7,6 +7,8 @@ class Program
     static string title = "";
     /// <summary>The notification message</summary>
     static string message = "";
+    /// <summary>Attribution text to show on the notification</summary>
+    static string? attribution;
     /// <summary>An hero image to show with the notification</summary>
     static string? heroImage;
     /// <summary>An image to show with the notification</summary>
@@ -23,7 +25,7 @@ class Program
         try
         {
             ParseArgs(args);
-            ShowNotification(title, message, heroImage, inlineImage, icon);
+            ShowNotification(title, message, heroImage, inlineImage, icon, attribution);
         }
         catch (Exception ex)
         {
@@ -35,7 +37,7 @@ class Program
     /// <summary>
     /// Build and Show the Windows Toast Notification
     /// </summary>
-    private static void ShowNotification(string title, string message, string? heroImage, string? inlineImage, string? icon)
+    private static void ShowNotification(string title, string message, string? heroImage, string? inlineImage, string? icon, string? attribution)
     {
         // Toast Builder
         var builder = new ToastContentBuilder()
@@ -60,6 +62,12 @@ class Program
         if (!string.IsNullOrEmpty(inlineImage))
         {
             builder.AddInlineImage(new Uri(inlineImage));
+        }
+
+        // Show Attribution Text, if any
+        if (!string.IsNullOrEmpty(attribution))
+        {
+            builder.AddAttributionText(attribution);
         }
 
         // Show Toast Notification
@@ -100,6 +108,10 @@ class Program
                 case "-l":
                 case "--logo":
                     if (i + 1 < args.Length) icon = args[++i];
+                    break;
+                case "-a":
+                case "--attribution":
+                    if (i + 1 < args.Length) attribution = args[++i];
                     break;
                 default:
                     // Everything that isn't a flag is stored as a positional argument
