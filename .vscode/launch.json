@@ -1,0 +1,24 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Console: flags",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "dotnet: build",
+            "program": "${workspaceFolder}/bin/Debug/net9.0/WinToast.dll",
+            "args": "${input:argsPrompt}",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        }
+    ],
+    "inputs": [
+        {
+            "id": "argsPrompt",
+            "type": "promptString",
+            "description": "Enter the command-line arguments for the application",
+            "default": "-t \"My Title\" -m \"Hello from the debugger!\""
+        }
+    ]
+}
