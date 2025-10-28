@@ -7,6 +7,8 @@ class Program
     static string title = "";
     /// <summary>The notification message</summary>
     static string message = "";
+    /// <summary>An hero image to show with the notification</summary>
+    static string? heroImage;
     /// <summary>An image to show with the notification</summary>
     static string? inlineImage;
     /// <summary>The notification icon</summary>
@@ -21,7 +23,7 @@ class Program
         try
         {
             ParseArgs(args);
-            ShowNotification(title, message, inlineImage, icon);
+            ShowNotification(title, message, heroImage, inlineImage, icon);
         }
         catch (Exception ex)
         {
@@ -33,7 +35,7 @@ class Program
     /// <summary>
     /// Build and Show the Windows Toast Notification
     /// </summary>
-    private static void ShowNotification(string title, string message, string? inlineImage, string? icon)
+    private static void ShowNotification(string title, string message, string? heroImage, string? inlineImage, string? icon)
     {
         // Toast Builder
         var builder = new ToastContentBuilder()
@@ -46,6 +48,12 @@ class Program
             Uri uri = new Uri(icon);
             var iconCrop = ToastGenericAppLogoCrop.Default;
             builder.AddAppLogoOverride(uri, iconCrop);
+        }
+
+        // Show Hero Image
+        if (!string.IsNullOrEmpty(heroImage))
+        {
+            builder.AddHeroImage(new Uri(heroImage));
         }
 
         // Show Inline Image
@@ -79,6 +87,11 @@ class Program
                 case "--body":
                 case "--contents":
                     if (i + 1 < args.Length) message = args[++i];
+                    break;
+                case "-h":
+                case "--image":
+                case "--hero-image":
+                    if (i + 1 < args.Length) heroImage = args[++i];
                     break;
                 case "-i":
                 case "--inline-image":
