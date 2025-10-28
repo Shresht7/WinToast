@@ -1,4 +1,7 @@
-﻿class Program
+﻿// Library
+using Microsoft.Toolkit.Uwp.Notifications;
+
+class Program
 {
     /// <summary>The notification title</summary>
     static string title = "";
@@ -6,13 +9,35 @@
     static string message = "";
 
 
+    /// <summary>
+    /// The main entrypoint of the application
+    /// </summary>
+    /// <param name="args">The command-line-arguments</param>
     static void Main(string[] args)
     {
-        // Parse the command-line-arguments
-        ParseArgs(args);
+        try
+        {
+            ParseArgs(args);
+            ShowNotification();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            Environment.Exit(1);
+        }
+    }
 
-        Console.WriteLine($"title: {title}");
-        Console.WriteLine($"message: {message}");
+    /// <summary>
+    /// Build and Show the Windows Toast Notification
+    /// </summary>
+    private static void ShowNotification()
+    {
+        // Toast Builder
+        var builder = new ToastContentBuilder()
+            .AddText(title)
+            .AddText(message);
+        // Show Toast Notification
+        builder.Show();
     }
 
     /// <summary>
