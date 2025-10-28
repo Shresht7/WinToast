@@ -7,7 +7,8 @@ class Program
     static string title = "";
     /// <summary>The notification message</summary>
     static string message = "";
-
+    /// <summary>An image to show with the notification</summary>
+    static string? image;
 
     /// <summary>
     /// The main entrypoint of the application
@@ -18,7 +19,7 @@ class Program
         try
         {
             ParseArgs(args);
-            ShowNotification(title, message);
+            ShowNotification(title, message, image);
         }
         catch (Exception ex)
         {
@@ -30,12 +31,19 @@ class Program
     /// <summary>
     /// Build and Show the Windows Toast Notification
     /// </summary>
-    private static void ShowNotification(string title, string message)
+    private static void ShowNotification(string title, string message, string? image)
     {
         // Toast Builder
         var builder = new ToastContentBuilder()
             .AddText(title)
             .AddText(message);
+
+        // Show Inline Image
+        if (!string.IsNullOrEmpty(image))
+        {
+            builder.AddInlineImage(new Uri(image));
+        }
+
         // Show Toast Notification
         builder.Show();
     }
@@ -61,6 +69,10 @@ class Program
                 case "--body":
                 case "--contents":
                     if (i + 1 < args.Length) message = args[++i];
+                    break;
+                case "-i":
+                case "--image":
+                    if (i + 1 < args.Length) image = args[++i];
                     break;
                 default:
                     // Everything that isn't a flag is stored as a positional argument
