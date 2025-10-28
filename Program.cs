@@ -18,7 +18,7 @@ class Program
         try
         {
             ParseArgs(args);
-            ShowNotification();
+            ShowNotification(title, message);
         }
         catch (Exception ex)
         {
@@ -30,7 +30,7 @@ class Program
     /// <summary>
     /// Build and Show the Windows Toast Notification
     /// </summary>
-    private static void ShowNotification()
+    private static void ShowNotification(string title, string message)
     {
         // Toast Builder
         var builder = new ToastContentBuilder()
