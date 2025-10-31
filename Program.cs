@@ -21,7 +21,13 @@ class Program
             }
 
             // Show the notification
-            ShowNotification(options);
+            bool success = ShowNotification(options);
+
+            // Exit the program with error code if the notification failed
+            if (!success)
+            {
+                Environment.Exit(1);
+            }
         }
         catch (Exception ex)
         {
@@ -33,7 +39,7 @@ class Program
     /// <summary>
     /// Build and Show the Windows Toast Notification
     /// </summary>
-    private static void ShowNotification(NotificationOptions options)
+    private static bool ShowNotification(NotificationOptions options)
     {
         // Toast Builder
         var builder = new ToastContentBuilder()
@@ -52,6 +58,7 @@ class Program
             catch (UriFormatException)
             {
                 Console.WriteLine($"Error: The icon URI '{options.Icon}' is not a valid URI.");
+                return false;
             }
         }
 
@@ -65,6 +72,7 @@ class Program
             catch (UriFormatException)
             {
                 Console.WriteLine($"Error: The hero image URI '{options.HeroImage}' is not a valid URI.");
+                return false;
             }
         }
 
@@ -78,6 +86,7 @@ class Program
             catch (UriFormatException)
             {
                 Console.WriteLine($"Error: The inline image URI '{options.InlineImage}' is not a valid URI.");
+                return false;
             }
         }
 
@@ -98,11 +107,13 @@ class Program
             catch (UriFormatException)
             {
                 Console.WriteLine($"Error: The protocol activation URI '{options.ProtocolActivation}' is not a valid URI.");
+                return false;
             }
         }
 
         // Show Toast Notification
         builder.Show();
+        return true;
     }
 
     /// <summary>
