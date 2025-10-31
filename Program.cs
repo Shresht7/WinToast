@@ -111,8 +111,16 @@ class Program
             }
         }
 
-        // Show Toast Notification
-        builder.Show();
+        // Show or Schedule the toast notification
+        if (options.ScheduledTime.HasValue)
+        {
+            builder.Schedule(options.ScheduledTime.Value);
+            Console.WriteLine($"Notification scheduled for {options.ScheduledTime.Value}");
+        }
+        else
+        {
+            builder.Show();
+        }
         return true;
     }
 
@@ -165,6 +173,24 @@ class Program
                 case "--activate":
                     if (i + 1 < args.Length) options.ProtocolActivation = args[++i];
                     break;
+                case "--in":
+                    if (options.ScheduledTime.HasValue) { Console.WriteLine("Error: --in and --on are mutually exclusive."); Environment.Exit(1); }
+                    if (i + 1 < args.Length)
+                    {
+                        var scheduledTime = ParseRelativeDateTime(args[++i]);
+                        if (!scheduledTime.HasValue) { Console.WriteLine($"Error: Invalid format for --in: {args[i]}"); Environment.Exit(1); }
+                        options.ScheduledTime = scheduledTime;
+                    }
+                    break;
+                case "--on":
+                    if (options.ScheduledTime.HasValue) { Console.WriteLine("Error: --in and --on are mutually exclusive."); Environment.Exit(1); }
+                    if (i + 1 < args.Length)
+                    {
+                        var scheduledTime = ParseAbsoluteDateTime(args[++i]);
+                        if (!scheduledTime.HasValue) { Console.WriteLine($"Error: Invalid format for --on: {args[i]}"); Environment.Exit(1); }
+                        options.ScheduledTime = scheduledTime;
+                    }
+                    break;
                 default:
                     // Everything that isn't a flag is stored as a positional argument
                     positionalArguments.Add(args[i]);
@@ -184,6 +210,45 @@ class Program
         return options;
     }
 
+    private static DateTimeOffset? ParseAbsoluteDateTime(string input)
+    {
+        if (DateTime.TryParse(input, out DateTime parsedTime))
+        {
+            DateTimeOffset result = new DateTimeOffset(parsedTime);
+            if (parsedTime.Date == DateTime.Today && parsedTime < DateTime.Now)
+            {
+                result = result.AddDays(1);
+            }
+            return result;
+        }
+
+        if (DateTimeOffset.TryParse(input, out DateTimeOffset parsedDateTimeOffset))
+        {
+            return parsedDateTimeOffset;
+        }
+
+        return null;
+    }
+
+    private static DateTimeOffset? ParseRelativeDateTime(string input)
+    {
+        string[] parts = input.Split(' ');
+        if (parts.Length == 2 && int.TryParse(parts[0], out int amount))
+        {
+            string unit = parts[1].ToLower().TrimEnd('s');
+            TimeSpan offset;
+            switch (unit)
+            {
+                case "second": offset = TimeSpan.FromSeconds(amount); break;
+                case "minute": offset = TimeSpan.FromMinutes(amount); break;
+                case "hour": offset = TimeSpan.FromHours(amount); break;
+                default: return null;
+            }
+            return DateTimeOffset.Now.Add(offset);
+        }
+        return null;
+    }
+
     /// <summary>
     /// Shows the help message
     /// </summary>
@@ -201,6 +266,8 @@ class Program
         Console.WriteLine("    -l, --logo <url>             The notification icon");
         Console.WriteLine("      , --attribution <text>     Attribution text to show on the notification");
         Console.WriteLine("     -a, --activate <url>        Protocol Activation URI");
+        Console.WriteLine("     --in <time>                 Schedules the notification for a relative time (e.g., \"5 minutes\")");
+        Console.WriteLine("     --on <time>                 Schedules the notification for an absolute time (e.g., \"10:30pm\")");
         Console.WriteLine("    -h, --help                   Show this help message");
         Console.WriteLine();
         Console.WriteLine("Examples:");
@@ -230,4 +297,6 @@ class NotificationOptions
     public string? Icon { get; set; }
     /// <summary>A URI to activate when the user clicks the notification</summary>
     public string? ProtocolActivation { get; set; }
+    /// <summary>The scheduled time for the notification to be shown.</summary>
+    public DateTimeOffset? ScheduledTime { get; set; }
 }
