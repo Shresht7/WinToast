@@ -31,6 +31,8 @@ All arguments, except `title` and `message`, are optional. If at least a title o
 | `-l`, `--logo`          | Overrides the notification icon with a local file.          | `-l "C:\path\to\app.ico"`             |
 | `--attribution`         | Adds an attribution line at the bottom of the notification. | `--attribution "Via WinToast"`        |
 | `-a`, `--activate`      | A URI to open when the user clicks the notification.        | `-a "https://github.com"`             |
+| `--in`                  | Schedules the notification for a relative time.             | `--in "1h 30m"`                       |
+| `--on`                  | Schedules the notification for an absolute time.            | `--on "10:30pm"`                      |
 | `-h`, `--help`          | Displays this help message.                                 |                                       |
 
 ### Examples
@@ -43,7 +45,7 @@ Shows a simple notification with a title and message.
 WinToast "Build Complete" "Your project has finished building successfully."
 ```
 
-### 1. Notification with a Hero Image
+### 2. Notification with a Hero Image
 
 Displays a prominent image at the top of the notification. The path can be a local file or a URL.
 
@@ -51,7 +53,19 @@ Displays a prominent image at the top of the notification. The path can be a loc
 WinToast -t "New Photo" -m "Check out this picture from our trip!" -i "C:\Users\me\Pictures\vacation.jpg"
 ```
 
-### 1. Actionable Notification
+### 3. Scheduled Notification
+
+Schedules a notification to appear in the future. This can be a relative time or an absolute time.
+
+```shell
+# Schedules a notification for 5 minutes from now
+WinToast --title "Meeting Reminder" --message "Your daily stand-up starts in 5 minutes." --in "5m"
+
+# Schedules a notification for 8:00 PM on the upcoming Christmas day
+WinToast --title "Merry Christmas!" --message "Time to open presents!" --on "12/25 8:00pm"
+```
+
+### 4. Actionable Notification
 
 Opens a website or other URI when the user clicks the notification.
 

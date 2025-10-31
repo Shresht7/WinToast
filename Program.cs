@@ -1,5 +1,6 @@
 ﻿// Library
 using Microsoft.Toolkit.Uwp.Notifications;
+using System.Text.RegularExpressions;
 
 class Program
 {
@@ -111,8 +112,16 @@ class Program
             }
         }
 
-        // Show Toast Notification
-        builder.Show();
+        // Show or Schedule the toast notification
+        if (options.ScheduledTime.HasValue)
+        {
+            builder.Schedule(options.ScheduledTime.Value);
+            Console.WriteLine($"Notification scheduled for {options.ScheduledTime.Value.ToString("f")}");
+        }
+        else
+        {
+            builder.Show();
+        }
         return true;
     }
 
@@ -165,6 +174,20 @@ class Program
                 case "--activate":
                     if (i + 1 < args.Length) options.ProtocolActivation = args[++i];
                     break;
+                case "--in":
+                    if (i + 1 < args.Length)
+                    {
+                        var value = args[++i];
+                        HandleScheduledTime(options, ParseRelativeDateTime(value), value);
+                    }
+                    break;
+                case "--on":
+                    if (i + 1 < args.Length)
+                    {
+                        var value = args[++i];
+                        HandleScheduledTime(options, ParseAbsoluteDateTime(value), value);
+                    }
+                    break;
                 default:
                     // Everything that isn't a flag is stored as a positional argument
                     positionalArguments.Add(args[i]);
@@ -184,6 +207,84 @@ class Program
         return options;
     }
 
+    private static void HandleScheduledTime(NotificationOptions options, DateTimeOffset? scheduledTime, string originalValue)
+    {
+        if (options.ScheduledTime.HasValue)
+        {
+            throw new ArgumentException("--in and --on are mutually exclusive.");
+        }
+        if (!scheduledTime.HasValue)
+        {
+            throw new ArgumentException($"Invalid date/time format: {originalValue}");
+        }
+        options.ScheduledTime = scheduledTime;
+    }
+
+    private static DateTimeOffset? ParseAbsoluteDateTime(string input)
+    {
+        if (DateTime.TryParse(input, out DateTime parsedTime))
+        {
+            DateTimeOffset result = new DateTimeOffset(parsedTime);
+            if (parsedTime.Date == DateTime.Today && parsedTime < DateTime.Now)
+            {
+                result = result.AddDays(1);
+            }
+            return result;
+        }
+
+        if (DateTimeOffset.TryParse(input, out DateTimeOffset parsedDateTimeOffset))
+        {
+            return parsedDateTimeOffset;
+        }
+
+        return null;
+    }
+
+    private static DateTimeOffset? ParseRelativeDateTime(string input)
+    {
+        var totalOffset = TimeSpan.Zero;
+        var regex = new Regex(@"(\d+)\s*([a-zA-Z]+)");
+        var matches = regex.Matches(input);
+
+        if (matches.Count == 0) return null;
+
+        foreach (Match match in matches)
+        {
+            if (int.TryParse(match.Groups[1].Value, out int amount))
+            {
+                string unit = match.Groups[2].Value.ToLower();
+                if (unit != "s") unit = unit.TrimEnd('s');                     // Do not trim off a singular 's'
+                TimeSpan offset;
+                switch (unit)
+                {
+                    case "s":
+                    case "sec":
+                    case "second":
+                        offset = TimeSpan.FromSeconds(amount);
+                        break;
+                    case "m":
+                    case "min":
+                    case "minute":
+                        offset = TimeSpan.FromMinutes(amount);
+                        break;
+                    case "h":
+                    case "hr":
+                    case "hour":
+                        offset = TimeSpan.FromHours(amount);
+                        break;
+                    default:
+                        return null;
+                }
+                totalOffset = totalOffset.Add(offset);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        return DateTimeOffset.Now.Add(totalOffset);
+    }
+
     /// <summary>
     /// Shows the help message
     /// </summary>
@@ -201,11 +302,14 @@ class Program
         Console.WriteLine("    -l, --logo <url>             The notification icon");
         Console.WriteLine("      , --attribution <text>     Attribution text to show on the notification");
         Console.WriteLine("     -a, --activate <url>        Protocol Activation URI");
+        Console.WriteLine("     --in <time>                 Schedules the notification for a relative time (e.g., \"5 minutes\")");
+        Console.WriteLine("     --on <time>                 Schedules the notification for an absolute time (e.g., \"10:30pm\")");
         Console.WriteLine("    -h, --help                   Show this help message");
         Console.WriteLine();
         Console.WriteLine("Examples:");
         Console.WriteLine("    WinToast \"Basic Title\" \"A simple message.\"");
         Console.WriteLine("    WinToast -t \"Photo\" -m \"Look at this!\" -i \"C:\\path\\to\\image.png\"");
+        Console.WriteLine("    WinToast Reminder \"Check Oven\" --in \"10min 30s\"");
         Console.WriteLine("    WinToast --title \"GitHub\" --message \"New issue assigned\" --activate \"https://github.com/issues\"");
         Environment.Exit(0);
     }
@@ -230,4 +334,6 @@ class NotificationOptions
     public string? Icon { get; set; }
     /// <summary>A URI to activate when the user clicks the notification</summary>
     public string? ProtocolActivation { get; set; }
+    /// <summary>The scheduled time for the notification to be shown.</summary>
+    public DateTimeOffset? ScheduledTime { get; set; }
 }
