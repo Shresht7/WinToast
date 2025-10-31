@@ -309,6 +309,7 @@ class Program
         Console.WriteLine("Examples:");
         Console.WriteLine("    WinToast \"Basic Title\" \"A simple message.\"");
         Console.WriteLine("    WinToast -t \"Photo\" -m \"Look at this!\" -i \"C:\\path\\to\\image.png\"");
+        Console.WriteLine("    WinToast Reminder \"Check Oven\" --in \"10min 30s\"");
         Console.WriteLine("    WinToast --title \"GitHub\" --message \"New issue assigned\" --activate \"https://github.com/issues\"");
         Environment.Exit(0);
     }
