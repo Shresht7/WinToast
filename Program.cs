@@ -116,7 +116,7 @@ class Program
         if (options.ScheduledTime.HasValue)
         {
             builder.Schedule(options.ScheduledTime.Value);
-            Console.WriteLine($"Notification scheduled for {options.ScheduledTime.Value}");
+            Console.WriteLine($"Notification scheduled for {options.ScheduledTime.Value.ToString("f")}");
         }
         else
         {
@@ -211,11 +211,11 @@ class Program
     {
         if (options.ScheduledTime.HasValue)
         {
-            throw new ArgumentException("Error: --in and --on are mutually exclusive.");
+            throw new ArgumentException("--in and --on are mutually exclusive.");
         }
         if (!scheduledTime.HasValue)
         {
-            throw new ArgumentException($"Error: Invalid date/time format: {originalValue}");
+            throw new ArgumentException($"Invalid date/time format: {originalValue}");
         }
         options.ScheduledTime = scheduledTime;
     }
