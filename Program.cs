@@ -1,5 +1,6 @@
 ﻿// Library
 using Microsoft.Toolkit.Uwp.Notifications;
+using System.Text.RegularExpressions;
 
 class Program
 {
@@ -232,21 +233,46 @@ class Program
 
     private static DateTimeOffset? ParseRelativeDateTime(string input)
     {
-        string[] parts = input.Split(' ');
-        if (parts.Length == 2 && int.TryParse(parts[0], out int amount))
+        var totalOffset = TimeSpan.Zero;
+        var regex = new Regex(@"(\d+)\s*([a-zA-Z]+)");
+        var matches = regex.Matches(input);
+
+        if (matches.Count == 0) return null;
+
+        foreach (Match match in matches)
         {
-            string unit = parts[1].ToLower().TrimEnd('s');
-            TimeSpan offset;
-            switch (unit)
+            if (int.TryParse(match.Groups[1].Value, out int amount))
             {
-                case "second": offset = TimeSpan.FromSeconds(amount); break;
-                case "minute": offset = TimeSpan.FromMinutes(amount); break;
-                case "hour": offset = TimeSpan.FromHours(amount); break;
-                default: return null;
+                string unit = match.Groups[2].Value.ToLower().TrimEnd('s');
+                TimeSpan offset;
+                switch (unit)
+                {
+                    case "s":
+                    case "sec":
+                    case "second":
+                        offset = TimeSpan.FromSeconds(amount);
+                        break;
+                    case "m":
+                    case "min":
+                    case "minute":
+                        offset = TimeSpan.FromMinutes(amount);
+                        break;
+                    case "h":
+                    case "hr":
+                    case "hour":
+                        offset = TimeSpan.FromHours(amount);
+                        break;
+                    default:
+                        return null;
+                }
+                totalOffset = totalOffset.Add(offset);
             }
-            return DateTimeOffset.Now.Add(offset);
+            else
+            {
+                return null;
+            }
         }
-        return null;
+        return DateTimeOffset.Now.Add(totalOffset);
     }
 
     /// <summary>
