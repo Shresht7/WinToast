@@ -15,6 +15,8 @@ class Program
     static string? inlineImage;
     /// <summary>The notification icon</summary>
     static string? icon;
+    /// <summary>Protocol Activation URI</summary>
+    static string? protocolActivation;
 
     /// <summary>
     /// The main entrypoint of the application
@@ -25,7 +27,7 @@ class Program
         try
         {
             ParseArgs(args);
-            ShowNotification(title, message, heroImage, inlineImage, icon, attribution);
+            ShowNotification(title, message, heroImage, inlineImage, icon, attribution, protocolActivation);
         }
         catch (Exception ex)
         {
@@ -37,7 +39,7 @@ class Program
     /// <summary>
     /// Build and Show the Windows Toast Notification
     /// </summary>
-    private static void ShowNotification(string title, string message, string? heroImage, string? inlineImage, string? icon, string? attribution)
+    private static void ShowNotification(string title, string message, string? heroImage, string? inlineImage, string? icon, string? attribution, string? protocolActivation)
     {
         // Toast Builder
         var builder = new ToastContentBuilder()
@@ -68,6 +70,13 @@ class Program
         if (!string.IsNullOrEmpty(attribution))
         {
             builder.AddAttributionText(attribution);
+        }
+
+        // Protocol Activation
+        if (!string.IsNullOrEmpty(protocolActivation))
+        {
+            Uri uri = new Uri(protocolActivation);
+            builder.SetProtocolActivation(uri);
         }
 
         // Show Toast Notification
@@ -114,9 +123,13 @@ class Program
                 case "--logo":
                     if (i + 1 < args.Length) icon = args[++i];
                     break;
-                case "-a":
                 case "--attribution":
                     if (i + 1 < args.Length) attribution = args[++i];
+                    break;
+                case "-a":
+                case "--action":
+                case "--activate":
+                    if (i + 1 < args.Length) protocolActivation = args[++i];
                     break;
                 default:
                     // Everything that isn't a flag is stored as a positional argument
