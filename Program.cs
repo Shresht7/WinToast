@@ -86,6 +86,11 @@ class Program
             switch (args[i])
             {
                 // Check for flags and extract their values
+                case "-h":
+                case "--help":
+                case "help":
+                    ShowHelp();
+                    break;
                 case "-t":
                 case "--title":
                     if (i + 1 < args.Length) title = args[++i];
@@ -96,12 +101,12 @@ class Program
                 case "--contents":
                     if (i + 1 < args.Length) message = args[++i];
                     break;
-                case "-h":
+                case "-i":
                 case "--image":
                 case "--hero-image":
                     if (i + 1 < args.Length) heroImage = args[++i];
                     break;
-                case "-i":
+                case "-ii":
                 case "--inline-image":
                     if (i + 1 < args.Length) inlineImage = args[++i];
                     break;
@@ -129,5 +134,25 @@ class Program
         {
             message = positionalArguments[1];
         }
+    }
+
+    /// <summary>
+    /// Shows the help message
+    /// </summary>
+    private static void ShowHelp()
+    {
+        Console.WriteLine("WinToast - A command-line-interface for Windows Notifications");
+        Console.WriteLine();
+        Console.WriteLine("Usage: WinToast [options] [title] [message]");
+        Console.WriteLine();
+        Console.WriteLine("Options:");
+        Console.WriteLine("  -t, --title <title>          The notification title");
+        Console.WriteLine("  -m, --message <message>      The notification message");
+        Console.WriteLine("  -h, --hero-image <url>       An hero image to show with the notification");
+        Console.WriteLine("  -i, --inline-image <url>     An image to show with the notification");
+        Console.WriteLine("  -l, --logo <url>             The notification icon");
+        Console.WriteLine("  -a, --attribution <text>     Attribution text to show on the notification");
+        Console.WriteLine("  -h, --help                   Show this help message");
+        Environment.Exit(0);
     }
 }
