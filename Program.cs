@@ -3,21 +3,6 @@ using Microsoft.Toolkit.Uwp.Notifications;
 
 class Program
 {
-    /// <summary>The notification title</summary>
-    static string title = "";
-    /// <summary>The notification message</summary>
-    static string message = "";
-    /// <summary>Attribution text to show on the notification</summary>
-    static string? attribution;
-    /// <summary>An hero image to show with the notification</summary>
-    static string? heroImage;
-    /// <summary>An image to show with the notification</summary>
-    static string? inlineImage;
-    /// <summary>The notification icon</summary>
-    static string? icon;
-    /// <summary>Protocol Activation URI</summary>
-    static string? protocolActivation;
-
     /// <summary>
     /// The main entrypoint of the application
     /// </summary>
@@ -26,8 +11,8 @@ class Program
     {
         try
         {
-            ParseArgs(args);
-            ShowNotification(title, message, heroImage, inlineImage, icon, attribution, protocolActivation);
+            var options = ParseArgs(args);      // Parse the command-line arguments
+            ShowNotification(options);          // Show the notification
         }
         catch (Exception ex)
         {
@@ -39,43 +24,43 @@ class Program
     /// <summary>
     /// Build and Show the Windows Toast Notification
     /// </summary>
-    private static void ShowNotification(string title, string message, string? heroImage, string? inlineImage, string? icon, string? attribution, string? protocolActivation)
+    private static void ShowNotification(NotificationOptions options)
     {
         // Toast Builder
         var builder = new ToastContentBuilder()
-            .AddText(title)
-            .AddText(message);
+            .AddText(options.Title)
+            .AddText(options.Message);
 
         // Update the app icon, if necessary
-        if (!string.IsNullOrEmpty(icon))
+        if (!string.IsNullOrEmpty(options.Icon))
         {
-            Uri uri = new Uri(icon);
+            Uri uri = new Uri(options.Icon);
             var iconCrop = ToastGenericAppLogoCrop.Default;
             builder.AddAppLogoOverride(uri, iconCrop);
         }
 
         // Show Hero Image
-        if (!string.IsNullOrEmpty(heroImage))
+        if (!string.IsNullOrEmpty(options.HeroImage))
         {
-            builder.AddHeroImage(new Uri(heroImage));
+            builder.AddHeroImage(new Uri(options.HeroImage));
         }
 
         // Show Inline Image
-        if (!string.IsNullOrEmpty(inlineImage))
+        if (!string.IsNullOrEmpty(options.InlineImage))
         {
-            builder.AddInlineImage(new Uri(inlineImage));
+            builder.AddInlineImage(new Uri(options.InlineImage));
         }
 
         // Show Attribution Text, if any
-        if (!string.IsNullOrEmpty(attribution))
+        if (!string.IsNullOrEmpty(options.Attribution))
         {
-            builder.AddAttributionText(attribution);
+            builder.AddAttributionText(options.Attribution);
         }
 
         // Protocol Activation
-        if (!string.IsNullOrEmpty(protocolActivation))
+        if (!string.IsNullOrEmpty(options.ProtocolActivation))
         {
-            Uri uri = new Uri(protocolActivation);
+            Uri uri = new Uri(options.ProtocolActivation);
             builder.SetProtocolActivation(uri);
         }
 
@@ -87,8 +72,9 @@ class Program
     /// Parses the given command-line-arguments
     /// </summary>
     /// <param name="args">The command-line arguments coming in from Main</param>
-    private static void ParseArgs(string[] args)
+    private static NotificationOptions ParseArgs(string[] args)
     {
+        var options = new NotificationOptions();
         List<string> positionalArguments = [];
         for (int i = 0; i < args.Length; i++)
         {
@@ -102,34 +88,34 @@ class Program
                     break;
                 case "-t":
                 case "--title":
-                    if (i + 1 < args.Length) title = args[++i];
+                    if (i + 1 < args.Length) options.Title = args[++i];
                     break;
                 case "-m":
                 case "--message":
                 case "--body":
                 case "--contents":
-                    if (i + 1 < args.Length) message = args[++i];
+                    if (i + 1 < args.Length) options.Message = args[++i];
                     break;
                 case "-i":
                 case "--image":
                 case "--hero-image":
-                    if (i + 1 < args.Length) heroImage = args[++i];
+                    if (i + 1 < args.Length) options.HeroImage = args[++i];
                     break;
                 case "-ii":
                 case "--inline-image":
-                    if (i + 1 < args.Length) inlineImage = args[++i];
+                    if (i + 1 < args.Length) options.InlineImage = args[++i];
                     break;
                 case "-l":
                 case "--logo":
-                    if (i + 1 < args.Length) icon = args[++i];
+                    if (i + 1 < args.Length) options.Icon = args[++i];
                     break;
                 case "--attribution":
-                    if (i + 1 < args.Length) attribution = args[++i];
+                    if (i + 1 < args.Length) options.Attribution = args[++i];
                     break;
                 case "-a":
                 case "--action":
                 case "--activate":
-                    if (i + 1 < args.Length) protocolActivation = args[++i];
+                    if (i + 1 < args.Length) options.ProtocolActivation = args[++i];
                     break;
                 default:
                     // Everything that isn't a flag is stored as a positional argument
@@ -138,15 +124,16 @@ class Program
             }
         }
         // if the `title` is still empty, check if we can take the first positional argument
-        if (string.IsNullOrEmpty(title) && positionalArguments.Count > 0)
+        if (string.IsNullOrEmpty(options.Title) && positionalArguments.Count > 0)
         {
-            title = positionalArguments[0];
+            options.Title = positionalArguments[0];
         }
         // If the `message` is still empty, check if we can take the second positional argument
-        if (string.IsNullOrEmpty(message) && positionalArguments.Count > 1)
+        if (string.IsNullOrEmpty(options.Message) && positionalArguments.Count > 1)
         {
-            message = positionalArguments[1];
+            options.Message = positionalArguments[1];
         }
+        return options;
     }
 
     /// <summary>
@@ -169,4 +156,25 @@ class Program
         Console.WriteLine("  -h, --help                   Show this help message");
         Environment.Exit(0);
     }
+}
+
+/// <summary>
+/// Holds all the configurable options for a toast notification
+/// </summary>
+class NotificationOptions
+{
+    /// <summary>The notification title</summary>
+    public string Title { get; set; } = "";
+    /// <summary>The notification message</summary>
+    public string Message { get; set; } = "";
+    /// <summary>Attribution text to show on the notification</summary>
+    public string? Attribution { get; set; }
+    /// <summary>A hero image to show with the notification</summary>
+    public string? HeroImage { get; set; }
+    /// <summary>An image to show within the notification body</summary>
+    public string? InlineImage { get; set; }
+    /// <summary>The notification icon</summary>
+    public string? Icon { get; set; }
+    /// <summary>A URI to activate when the user clicks the notification</summary>
+    public string? ProtocolActivation { get; set; }
 }
