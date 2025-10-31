@@ -161,10 +161,11 @@ class Program
         Console.WriteLine("Options:");
         Console.WriteLine("  -t, --title <title>          The notification title");
         Console.WriteLine("  -m, --message <message>      The notification message");
-        Console.WriteLine("  -h, --hero-image <url>       An hero image to show with the notification");
-        Console.WriteLine("  -i, --inline-image <url>     An image to show with the notification");
+        Console.WriteLine("  -i, --hero-image <url>       An hero image to show with the notification");
+        Console.WriteLine("    , --inline-image <url>     An image to show with the notification");
         Console.WriteLine("  -l, --logo <url>             The notification icon");
-        Console.WriteLine("  -a, --attribution <text>     Attribution text to show on the notification");
+        Console.WriteLine("    , --attribution <text>     Attribution text to show on the notification");
+        Console.WriteLine("   -a, --activate <url>        Protocol Activation URI");
         Console.WriteLine("  -h, --help                   Show this help message");
         Environment.Exit(0);
     }
