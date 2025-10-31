@@ -243,7 +243,8 @@ class Program
         {
             if (int.TryParse(match.Groups[1].Value, out int amount))
             {
-                string unit = match.Groups[2].Value.ToLower().TrimEnd('s');
+                string unit = match.Groups[2].Value.ToLower();
+                if (unit != "s") unit = unit.TrimEnd('s');                     // Do not trim off a singular 's'
                 TimeSpan offset;
                 switch (unit)
                 {
