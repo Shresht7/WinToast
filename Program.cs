@@ -194,14 +194,19 @@ class Program
         Console.WriteLine("Usage: WinToast [options] [title] [message]");
         Console.WriteLine();
         Console.WriteLine("Options:");
-        Console.WriteLine("  -t, --title <title>          The notification title");
-        Console.WriteLine("  -m, --message <message>      The notification message");
-        Console.WriteLine("  -i, --hero-image <url>       An hero image to show with the notification");
-        Console.WriteLine("    , --inline-image <url>     An image to show with the notification");
-        Console.WriteLine("  -l, --logo <url>             The notification icon");
-        Console.WriteLine("    , --attribution <text>     Attribution text to show on the notification");
-        Console.WriteLine("   -a, --activate <url>        Protocol Activation URI");
-        Console.WriteLine("  -h, --help                   Show this help message");
+        Console.WriteLine("    -t, --title <title>          The notification title");
+        Console.WriteLine("    -m, --message <message>      The notification message");
+        Console.WriteLine("    -i, --hero-image <url>       An hero image to show with the notification");
+        Console.WriteLine("      , --inline-image <url>     An image to show with the notification");
+        Console.WriteLine("    -l, --logo <url>             The notification icon");
+        Console.WriteLine("      , --attribution <text>     Attribution text to show on the notification");
+        Console.WriteLine("     -a, --activate <url>        Protocol Activation URI");
+        Console.WriteLine("    -h, --help                   Show this help message");
+        Console.WriteLine();
+        Console.WriteLine("Examples:");
+        Console.WriteLine("    WinToast \"Basic Title\" \"A simple message.\"");
+        Console.WriteLine("    WinToast -t \"Photo\" -m \"Look at this!\" -i \"C:\\path\\to\\image.png\"");
+        Console.WriteLine("    WinToast --title \"GitHub\" --message \"New issue assigned\" --activate \"https://github.com/issues\"");
         Environment.Exit(0);
     }
 }

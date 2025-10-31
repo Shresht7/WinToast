@@ -33,6 +33,32 @@ All arguments, except `title` and `message`, are optional. If at least a title o
 | `-a`, `--activate`      | A URI to open when the user clicks the notification.        | `-a "https://github.com"`             |
 | `-h`, `--help`          | Displays this help message.                                 |                                       |
 
+### Examples
+
+### 1. Basic Notification
+
+Shows a simple notification with a title and message.
+
+```shell
+WinToast "Build Complete" "Your project has finished building successfully."
+```
+
+### 1. Notification with a Hero Image
+
+Displays a prominent image at the top of the notification. The path can be a local file or a URL.
+
+```shell
+WinToast -t "New Photo" -m "Check out this picture from our trip!" -i "C:\Users\me\Pictures\vacation.jpg"
+```
+
+### 1. Actionable Notification
+
+Opens a website or other URI when the user clicks the notification.
+
+```shell
+WinToast --title "New Issue" --message "A new issue was assigned to you." --activate "https://github.com/issues"
+```
+
 ---
 
 ## 📄 License
