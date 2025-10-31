@@ -11,8 +11,17 @@ class Program
     {
         try
         {
-            var options = ParseArgs(args);      // Parse the command-line arguments
-            ShowNotification(options);          // Show the notification
+            // Parse the command-line arguments
+            var options = ParseArgs(args);
+
+            // Check to see we at least have a title and message. Otherwise, show the help message
+            if (string.IsNullOrEmpty(options.Title) && string.IsNullOrEmpty(options.Message))
+            {
+                ShowHelp();
+            }
+
+            // Show the notification
+            ShowNotification(options);
         }
         catch (Exception ex)
         {
