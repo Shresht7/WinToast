@@ -175,21 +175,17 @@ class Program
                     if (i + 1 < args.Length) options.ProtocolActivation = args[++i];
                     break;
                 case "--in":
-                    if (options.ScheduledTime.HasValue) { Console.WriteLine("Error: --in and --on are mutually exclusive."); Environment.Exit(1); }
                     if (i + 1 < args.Length)
                     {
-                        var scheduledTime = ParseRelativeDateTime(args[++i]);
-                        if (!scheduledTime.HasValue) { Console.WriteLine($"Error: Invalid format for --in: {args[i]}"); Environment.Exit(1); }
-                        options.ScheduledTime = scheduledTime;
+                        var value = args[++i];
+                        HandleScheduledTime(options, ParseRelativeDateTime(value), value);
                     }
                     break;
                 case "--on":
-                    if (options.ScheduledTime.HasValue) { Console.WriteLine("Error: --in and --on are mutually exclusive."); Environment.Exit(1); }
                     if (i + 1 < args.Length)
                     {
-                        var scheduledTime = ParseAbsoluteDateTime(args[++i]);
-                        if (!scheduledTime.HasValue) { Console.WriteLine($"Error: Invalid format for --on: {args[i]}"); Environment.Exit(1); }
-                        options.ScheduledTime = scheduledTime;
+                        var value = args[++i];
+                        HandleScheduledTime(options, ParseAbsoluteDateTime(value), value);
                     }
                     break;
                 default:
@@ -209,6 +205,19 @@ class Program
             options.Message = positionalArguments[1];
         }
         return options;
+    }
+
+    private static void HandleScheduledTime(NotificationOptions options, DateTimeOffset? scheduledTime, string originalValue)
+    {
+        if (options.ScheduledTime.HasValue)
+        {
+            throw new ArgumentException("Error: --in and --on are mutually exclusive.");
+        }
+        if (!scheduledTime.HasValue)
+        {
+            throw new ArgumentException($"Error: Invalid date/time format: {originalValue}");
+        }
+        options.ScheduledTime = scheduledTime;
     }
 
     private static DateTimeOffset? ParseAbsoluteDateTime(string input)
