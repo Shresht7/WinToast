@@ -34,21 +34,42 @@ class Program
         // Update the app icon, if necessary
         if (!string.IsNullOrEmpty(options.Icon))
         {
-            Uri uri = new Uri(options.Icon);
-            var iconCrop = ToastGenericAppLogoCrop.Default;
-            builder.AddAppLogoOverride(uri, iconCrop);
+            try
+            {
+                Uri uri = new Uri(options.Icon);
+                var iconCrop = ToastGenericAppLogoCrop.Default;
+                builder.AddAppLogoOverride(uri, iconCrop);
+            }
+            catch (UriFormatException)
+            {
+                Console.WriteLine($"Error: The icon URI '{options.Icon}' is not a valid URI.");
+            }
         }
 
         // Show Hero Image
         if (!string.IsNullOrEmpty(options.HeroImage))
         {
-            builder.AddHeroImage(new Uri(options.HeroImage));
+            try
+            {
+                builder.AddHeroImage(new Uri(options.HeroImage));
+            }
+            catch (UriFormatException)
+            {
+                Console.WriteLine($"Error: The hero image URI '{options.HeroImage}' is not a valid URI.");
+            }
         }
 
         // Show Inline Image
         if (!string.IsNullOrEmpty(options.InlineImage))
         {
-            builder.AddInlineImage(new Uri(options.InlineImage));
+            try
+            {
+                builder.AddInlineImage(new Uri(options.InlineImage));
+            }
+            catch (UriFormatException)
+            {
+                Console.WriteLine($"Error: The inline image URI '{options.InlineImage}' is not a valid URI.");
+            }
         }
 
         // Show Attribution Text, if any
@@ -60,8 +81,15 @@ class Program
         // Protocol Activation
         if (!string.IsNullOrEmpty(options.ProtocolActivation))
         {
-            Uri uri = new Uri(options.ProtocolActivation);
-            builder.SetProtocolActivation(uri);
+            try
+            {
+                Uri uri = new Uri(options.ProtocolActivation);
+                builder.SetProtocolActivation(uri);
+            }
+            catch (UriFormatException)
+            {
+                Console.WriteLine($"Error: The protocol activation URI '{options.ProtocolActivation}' is not a valid URI.");
+            }
         }
 
         // Show Toast Notification
