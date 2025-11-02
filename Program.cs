@@ -112,6 +112,25 @@ class Program
             }
         }
 
+        // Add buttons, if any
+        foreach (var button in options.Buttons)
+        {
+            var parts = button.Split(new[] { '|' }, 2);
+            var buttonBuilder = new ToastButton();
+            buttonBuilder.SetContent(parts[0]);
+
+            if (parts.Length > 1 && !string.IsNullOrEmpty(parts[1]))
+            {
+                buttonBuilder.SetProtocolActivation(new Uri(parts[1]));
+            }
+            else
+            {
+                // This makes the button dismiss the notification
+                buttonBuilder.SetDismissActivation();
+            }
+            builder.AddButton(buttonBuilder);
+        }
+
         // Show or Schedule the toast notification
         if (options.ScheduledTime.HasValue)
         {
@@ -187,6 +206,10 @@ class Program
                         var value = args[++i];
                         HandleScheduledTime(options, ParseAbsoluteDateTime(value), value);
                     }
+                    break;
+                case "-b":
+                case "--button":
+                    if (i + 1 < args.Length) options.Buttons.Add(args[++i]);
                     break;
                 default:
                     // Everything that isn't a flag is stored as a positional argument
@@ -302,6 +325,7 @@ class Program
         Console.WriteLine("    -l, --logo <url>             The notification icon");
         Console.WriteLine("      , --attribution <text>     Attribution text to show on the notification");
         Console.WriteLine("     -a, --activate <url>        Protocol Activation URI");
+        Console.WriteLine("     -b, --button <text|action>  A button to show on the notification. Can be specified multiple times.");
         Console.WriteLine("     --in <time>                 Schedules the notification for a relative time (e.g., \"5 minutes\")");
         Console.WriteLine("     --on <time>                 Schedules the notification for an absolute time (e.g., \"10:30pm\")");
         Console.WriteLine("    -h, --help                   Show this help message");
@@ -311,6 +335,7 @@ class Program
         Console.WriteLine("    WinToast -t \"Photo\" -m \"Look at this!\" -i \"C:\\path\\to\\image.png\"");
         Console.WriteLine("    WinToast Reminder \"Check Oven\" --in \"10min 30s\"");
         Console.WriteLine("    WinToast --title \"GitHub\" --message \"New issue assigned\" --activate \"https://github.com/issues\"");
+        Console.WriteLine("    WinToast -t \"Update available\" -b \"Install|https://example.com\" -b \"Later|\"");
         Environment.Exit(0);
     }
 }
@@ -336,4 +361,6 @@ class NotificationOptions
     public string? ProtocolActivation { get; set; }
     /// <summary>The scheduled time for the notification to be shown.</summary>
     public DateTimeOffset? ScheduledTime { get; set; }
+    /// <summary>A list of buttons to display on the notification.</summary>
+    public List<string> Buttons { get; set; } = new();
 }
